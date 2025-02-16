@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="title">Marketplace</title>
+    <!--<link rel="stylesheet" href="styles.css">-->
+    <style>
+        *{
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
+        body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+}
+header {
+    padding: 10px;
+    background: #007bff;
+    color: white;
+}
+input, button {
+    margin-top: 10px;
+    padding: 5px;
+}
+.product {
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin: 10px;
+    display: inline-block;
+}
+img {
+    max-width: 100px;
+}
+        .menu {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 10px;
+            background: #007bff;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+        }
+        .menu a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            margin: 0 10px;
+        }
+        .menu a:hover {
+            text-decoration: underline;
+        }
+        .menu-icon {
+            font-size: 24px;
+            cursor: pointer;
+            margin-left: 10px;
+            color: white;
+        }
+        .dropdown {
+            display: none;
+            position: absolute;
+            right: 10px;
+            top: 50px;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 10px;
+            width: 250px;
+        }
+        .dropdown.show {
+            display: block;
+        }
+        .dropdown a {
+            display: block;
+            padding: 5px 10px;
+            color: black;
+            text-decoration: none;
+        }
+        .dropdown a:hover {
+            background: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1 id="header-title">Marketplace</h1>
+        <div class="menu">
+            <a href="#" onclick="showLogin()" id="login">Log in</a> | 
+            <a href="#" onclick="showSignup()" id="signup">Sign up</a>
+            <span class="menu-icon" onclick="toggleMenu()">☰</span>
+        </div>
+        <div class="dropdown" id="categoryMenu">
+            <div id="categories"></div>
+        </div>
+        <select id="language" onchange="changeLanguage()">
+            <option value="pl">Polski</option>
+            <option value="en">English</option>
+            <option value="ru">Русский</option>
+            <option value="ua">Українська</option>
+        </select>
+        <input type="text" id="search" placeholder="Szukaj produktów...">
+        <button onclick="searchProducts()" id="search-btn">Szukaj</button>
+    </header>
+    
+    <main id="products"></main>
+    
+    <button id="add-product" onclick="addProduct()">Dodaj Produkt</button>
+    
+    <script>
+        const translations = {
+            pl: {
+                title: "Marketplace",
+                login: "Zaloguj się",
+                signup: "Zarejestruj się",
+                searchPlaceholder: "Szukaj produktów...",
+                searchBtn: "Szukaj",
+                addProduct: "Dodaj Produkt",
+                categories: ["Elektronika", "Motoryzacja", "Moda", "Dom i Ogród", "Sport i Hobby", "Dziecko", "Zdrowie i Uroda", "Muzyka i Edukacja", "Gry i Konsole", "Usługi", "Rolnictwo", "Zwierzaki", "Praca", "Turystyka", "Ślub i Wesele", "Biznes i Przemysł", "Nieruchomości", "Sprzęt budowlany", "Inne produkty"]
+            },
+            en: {
+                title: "Marketplace",
+                login: "Log in",
+                signup: "Sign up",
+                searchPlaceholder: "Search products...",
+                searchBtn: "Search",
+                addProduct: "Add Product",
+                categories: ["Electronics", "Automotive", "Fashion", "Home & Garden", "Sports & Hobbies", "Kids", "Health & Beauty", "Music & Education", "Games & Consoles", "Services", "Agriculture", "Pets", "Jobs", "Tourism", "Weddings", "Business & Industry", "Real Estate", "Construction Equipment", "Other Products"]
+            },
+            ru: {
+                title: "Торговая площадка",
+                login: "Войти",
+                signup: "Регистрация",
+                searchPlaceholder: "Поиск товаров...",
+                searchBtn: "Поиск",
+                addProduct: "Добавить товар",
+                categories: ["Электроника", "Авто", "Мода", "Дом и Сад", "Спорт и Хобби", "Дети", "Здоровье и Красота", "Музыка и Образование", "Игры и Консоли", "Услуги", "Сельское хозяйство", "Животные", "Работа", "Туризм", "Свадьбы", "Бизнес и Промышленность", "Недвижимость", "Строительное оборудование", "Другие товары"]
+            },
+            ua: {
+                title: "Маркетплейс",
+                login: "Увійти",
+                signup: "Зареєструватися",
+                searchPlaceholder: "Пошук товарів...",
+                searchBtn: "Пошук",
+                addProduct: "Додати товар",
+                categories: ["Електроніка", "Авто", "Мода", "Дім і Сад", "Спорт і Хобі", "Діти", "Здоров'я та краса", "Музика та освіта", "Ігри та консолі", "Послуги", "Сільське господарство", "Тварини", "Робота", "Туризм", "Весілля", "Бізнес та промисловість", "Нерухомість", "Будівельне обладнання", "Інші товари"]
+            }
+        };
+        
+        function toggleMenu() {
+            const menu = document.getElementById("categoryMenu");
+            menu.classList.toggle("show");
+        }
+        
+        function changeLanguage() {
+            const lang = document.getElementById("language").value;
+            document.getElementById("title").innerText = translations[lang].title;
+            document.getElementById("header-title").innerText = translations[lang].title;
+            document.getElementById("login").innerText = translations[lang].login;
+            document.getElementById("signup").innerText = translations[lang].signup;
+            document.getElementById("search").placeholder = translations[lang].searchPlaceholder;
+            document.getElementById("search-btn").innerText = translations[lang].searchBtn;
+            document.getElementById("add-product").innerText = translations[lang].addProduct;
+            
+            const categoriesContainer = document.getElementById("categories");
+            categoriesContainer.innerHTML = "";
+            translations[lang].categories.forEach(category => {
+                const categoryElement = document.createElement("a");
+                categoryElement.href = "#";
+                categoryElement.innerText = category;
+                categoryElement.classList.add("category");
+                categoriesContainer.appendChild(categoryElement);
+            });
+        }
+        
+        document.addEventListener("DOMContentLoaded", () => {
+            changeLanguage();
+        });
+    </script>
+</body>
+</html>
